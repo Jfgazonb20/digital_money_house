@@ -28,13 +28,17 @@ Invalidación del token JWT.
 
 
 🌱 Nuevas Funcionalidades (Sprint 2 - 19/11/2024)
+
 📊 Dashboard
+
 GET /accounts/{ID}: Obtener el balance actual.
+
 GET /accounts/{ID}/transactions: Listar las últimas 5 transacciones.
 
 
 
 🛠️ Tecnologías Utilizadas
+
 Java + Spring Boot: Desarrollo de la API REST.
 MySQL: Gestión de la base de datos.
 JWT: Seguridad y autenticación.
