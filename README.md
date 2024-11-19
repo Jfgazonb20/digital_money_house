@@ -1,13 +1,15 @@
 
-¡Entendido! Vamos a mejorar la estructura de tu README para que sea más legible y profesional. Aquí tienes una versión actualizada:
-
 🏦 Digital Money House - Billetera Virtual
+
 📚 Descripción del Proyecto
+
 Digital Money House es una billetera virtual diseñada para ofrecer una experiencia ágil y segura. Este proyecto es parte del desafío profesional de backend, donde se implementa una API REST que permite la gestión de cuentas, sesiones de usuario, transacciones financieras y más.
 
 
 🚀 Funcionalidades Implementadas
+
 🔒 Gestión de Usuario (Sprint 1)
+
 Registro de Usuario
 
 
