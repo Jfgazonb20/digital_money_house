@@ -88,4 +88,35 @@ VALUES
 (1, -50.00, '2024-11-15', 'Compra en línea');
 ```
 ---
+### 🔥 API ENDPOITS (funciona insetarndo el bearer token
+
+- **GET http://localhost:8080/api/users/{id}
+
+```🆗 Salida JSON espera 200 OK
+  "id": 1,
+  "username": "nuevoUsuario",
+  "email": "nuevoUsuario@example.com",
+  "cvu": "1234567890123456789012",
+  "alias": "alias.ejemplo"
+```
+
+
+- **PATCH http://localhost:8080/api/users/{patch}
+- 
+```🆗 Entrada campos  a actualizar
+  "email": "usuarioactualizado@example.com",
+  "alias": "nuevo.alias"
+```
+
+```🆗 Salida JSON espera 200 OK
+  "id": 1,
+  "username": "nuevoUsuario",
+  "email": "usuarioactualizado@example.com",
+  "cvu": "1234567890123456789012",
+  "alias": "nuevo.alias"
+```
+
+
+
+---
 💡 **¡Seguimos construyendo una experiencia financiera segura y eficiente!**
