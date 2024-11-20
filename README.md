@@ -71,7 +71,7 @@ VALUES
 ('123456789', 1000.00);
 ```
 
-2️⃣ Insertar datos en la tabla transaction
+## 2️⃣ Insertar datos en la tabla transaction
 Para insertar datos en la tabla transaction, sigue estos pasos:
 
 Abre pgAdmin4 y conéctate a tu base de datos.
