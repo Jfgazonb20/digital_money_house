@@ -80,7 +80,7 @@ VALUES
 ---
 ### 🔥 API ENDPOITS (funciona insertando el bearer token)
 
-- **GET http://localhost:8080/api/users/{id}
+- **GET http://localhost:8080/api/users/{id}**: Obtener User por ID
 
 ```🆗 Salida JSON espera 200 OK
   "id": 1,
@@ -91,7 +91,7 @@ VALUES
 ```
 
 
-- **PATCH http://localhost:8080/api/users/{patch}
+- **PATCH http://localhost:8080/api/users/{id}**: Actualizar campos
   
 ```🆗 Entrada campos  a actualizar
   "email": "usuarioactualizado@example.com",
