@@ -13,6 +13,22 @@ public class AccountService {
     public AccountService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
+    public Account updateAccount(Long id, Account updatedAccountData) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: " + id));
+
+        if (updatedAccountData.getAccountNumber() != null) {
+            account.setAccountNumber(updatedAccountData.getAccountNumber());
+        }
+
+        if (updatedAccountData.getBalance() != null) {
+            account.setBalance(updatedAccountData.getBalance());
+        }
+
+        accountRepository.save(account);
+        return account;
+    }
+
 
     public Account getAccountById(Long id) {
         return accountRepository.findById(id)

@@ -26,6 +26,19 @@ public class UserController {
         }
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
+    @PatchMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUserData) {
+        User updatedUser = userService.updateUser(id, updatedUserData);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
     @GetMapping("/protected")
     public ResponseEntity<String> getProtectedData() {
         return ResponseEntity.ok("Esta es información protegida.");

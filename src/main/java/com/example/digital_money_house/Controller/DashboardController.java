@@ -31,6 +31,12 @@ public class DashboardController {
         response.put("balance", account.getBalance());
         return ResponseEntity.ok(response);
     }
+    @PatchMapping("/{id}")
+    public ResponseEntity<Account> updateAccount(@PathVariable Long id, @RequestBody Account updatedAccountData) {
+        Account updatedAccount = accountService.updateAccount(id, updatedAccountData);
+        return ResponseEntity.ok(updatedAccount);
+    }
+
 
     @GetMapping("/{id}/transactions")
     public ResponseEntity<List<Transaction>> getLastFiveTransactions(@PathVariable Long id) {
