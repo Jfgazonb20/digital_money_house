@@ -1,7 +1,9 @@
 package com.example.digital_money_house;
 
 import com.example.digital_money_house.Exception.UserAlreadyExistsException;
+import com.example.digital_money_house.Model.Role;
 import com.example.digital_money_house.Model.User;
+import com.example.digital_money_house.Repository.RoleRepository;
 import com.example.digital_money_house.Repository.UserRepository;
 import com.example.digital_money_house.Service.UserService;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,9 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     private final UserRepository userRepository = Mockito.mock(UserRepository.class);
+    private final RoleRepository roleRepository = Mockito.mock(RoleRepository.class); // Agregamos RoleRepository
     private final PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
-    private final UserService userService = new UserService(userRepository, passwordEncoder);
+    private final UserService userService = new UserService(userRepository, roleRepository, passwordEncoder); // Constructor actualizado
 
     @Test
     void registerUser_Success() {
@@ -30,6 +33,7 @@ class UserServiceTest {
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
+        when(roleRepository.findByName("USER")).thenReturn(Optional.of(new Role("USER"))); // Mock de RoleRepository
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         userService.registerUser(user);
