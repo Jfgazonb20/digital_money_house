@@ -43,11 +43,6 @@ Digital Money House es una billetera virtual diseñada para ofrecer una experien
 - **RestAssured**: Testing automatizado.  
 
 ---
-# 📚 Instrucciones para insertar datos en la base de datos
-
-Para poder obtener información desde **Postman**, primero necesitas insertar algunos datos de ejemplo en las tablas correspondientes.
-
----
 ## ❌ Borrar registros y reiniciar secuencia de account y Transaction
 ```sql
 TRUNCATE TABLE account RESTART IDENTITY CASCADE;
@@ -57,7 +52,12 @@ TRUNCATE TABLE account RESTART IDENTITY CASCADE;
 TRUNCATE TABLE transaction RESTART IDENTITY CASCADE;
 
 ```
+---
+# 📚 Instrucciones para insertar datos en la base de datos
 
+Para poder obtener información desde **Postman**, primero necesitas insertar algunos datos de ejemplo en las tablas correspondientes.
+
+---
 
 ## 1️⃣ Insertar datos en la tabla `account`
 
@@ -70,7 +70,7 @@ INSERT INTO account (account_number, balance)
 VALUES
 ('123456789', 1000.00);
 ```
-
+---
 ## 2️⃣ Insertar datos en la tabla transaction
 Para insertar datos en la tabla transaction, sigue estos pasos:
 
@@ -87,5 +87,5 @@ VALUES
 (1, 300.00, '2024-11-16', 'Transferencia recibida'),
 (1, -50.00, '2024-11-15', 'Compra en línea');
 ```
-
+---
 💡 **¡Seguimos construyendo una experiencia financiera segura y eficiente!**
