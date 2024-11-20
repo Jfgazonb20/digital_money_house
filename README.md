@@ -88,7 +88,7 @@ VALUES
 (1, -50.00, '2024-11-15', 'Compra en línea');
 ```
 ---
-### 🔥 API ENDPOITS (funciona insetarndo el bearer token
+### 🔥 API ENDPOITS (funciona insertando el bearer token)
 
 - **GET http://localhost:8080/api/users/{id}
 
@@ -102,7 +102,7 @@ VALUES
 
 
 - **PATCH http://localhost:8080/api/users/{patch}
-- 
+  
 ```🆗 Entrada campos  a actualizar
   "email": "usuarioactualizado@example.com",
   "alias": "nuevo.alias"
