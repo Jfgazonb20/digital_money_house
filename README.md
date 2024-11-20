@@ -43,5 +43,36 @@ Digital Money House es una billetera virtual diseñada para ofrecer una experien
 - **RestAssured**: Testing automatizado.  
 
 ---
+# 📚 Instrucciones para insertar datos en la base de datos
+
+Para poder obtener información desde **Postman**, primero necesitas insertar algunos datos de ejemplo en las tablas correspondientes.
+
+---
+
+## 1️⃣ Insertar datos en la tabla `account`
+
+1. Abre **pgAdmin4** y conéctate a tu base de datos.
+2. Navega a **Query Tool**.
+3. Ejecuta el siguiente SQL para insertar datos en la tabla `account`:
+
+```sql
+INSERT INTO account (account_number, balance)
+VALUES
+('123456789', 1000.00);
+2️⃣ Insertar datos en la tabla transaction
+Para insertar datos en la tabla transaction, sigue estos pasos:
+
+Abre pgAdmin4 y conéctate a tu base de datos.
+Navega a Query Tool.
+Ejecuta el siguiente SQL para insertar las transacciones correspondientes:
+sql
+Copiar código
+INSERT INTO transaction (account_id, amount, date, description)
+VALUES
+(1, -200.00, '2024-11-19', 'Compra supermercado'),
+(1, 500.00, '2024-11-18', 'Pago depósito'),
+(1, -100.00, '2024-11-17', 'Pago de servicios'),
+(1, 300.00, '2024-11-16', 'Transferencia recibida'),
+(1, -50.00, '2024-11-15', 'Compra en línea');
 
 💡 **¡Seguimos construyendo una experiencia financiera segura y eficiente!**
