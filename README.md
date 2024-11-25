@@ -114,7 +114,7 @@ VALUES
 ## 🛠️ Tecnologías Utilizadas  
 
 - **Java + Spring Boot**: Desarrollo de la API REST.  
-- **MySQL**: Gestión de la base de datos.  
+- **POSTGRESQL**: Gestión de la base de datos.  
 - **JWT**: Seguridad y autenticación.  
 - **Docker**: Contenerización.  
 - **Swagger**: Documentación de la API.  
