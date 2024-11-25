@@ -13,10 +13,10 @@ public class DataInitializer {
     public CommandLineRunner initRoles(RoleRepository roleRepository) {
         return args -> {
             if (roleRepository.findByName("USER").isEmpty()) {
-                roleRepository.save(new Role(null, "USER"));
+                roleRepository.save(new Role("USER"));
             }
             if (roleRepository.findByName("ADMIN").isEmpty()) {
-                roleRepository.save(new Role(null, "ADMIN"));
+                roleRepository.save(new Role( "ADMIN"));
             }
         };
     }
