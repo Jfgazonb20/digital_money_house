@@ -1,7 +1,6 @@
 package com.example.digital_money_house;
 
 import com.example.digital_money_house.Controller.UserController;
-import com.example.digital_money_house.Exception.UserAlreadyExistsException;
 import com.example.digital_money_house.Model.User;
 import com.example.digital_money_house.Service.UserService;
 import org.junit.jupiter.api.Test;
@@ -36,12 +35,39 @@ class UserControllerTest {
         User user = new User();
         user.setUsername("testuser");
 
-        // Simula la excepción UserAlreadyExistsException
-        doThrow(new UserAlreadyExistsException("El nombre de usuario ya existe")).when(userService).registerUser(user);
+        doThrow(new RuntimeException("El nombre de usuario ya existe")).when(userService).registerUser(user);
 
         ResponseEntity<String> response = userController.registerUser(user);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(409); // HTTP 409 Conflict
+        assertThat(response.getStatusCodeValue()).isEqualTo(409);
         assertThat(response.getBody()).isEqualTo("El nombre de usuario ya existe");
+    }
+
+    @Test
+    void getUserById_Success() {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
+
+        when(userService.getUserById(1L)).thenReturn(user);
+
+        ResponseEntity<User> response = userController.getUserById(1L);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody().getUsername()).isEqualTo("testuser");
+    }
+
+    @Test
+    void updateUser_Success() {
+        User updatedUser = new User();
+        updatedUser.setId(1L);
+        updatedUser.setEmail("newemail@example.com");
+
+        when(userService.updateUser(eq(1L), any(User.class))).thenReturn(updatedUser);
+
+        ResponseEntity<User> response = userController.updateUser(1L, updatedUser);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody().getEmail()).isEqualTo("newemail@example.com");
     }
 }

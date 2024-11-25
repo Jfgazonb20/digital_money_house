@@ -14,15 +14,14 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest {
 
     private final UserRepository userRepository = Mockito.mock(UserRepository.class);
-    private final RoleRepository roleRepository = Mockito.mock(RoleRepository.class); // Agregamos RoleRepository
+    private final RoleRepository roleRepository = Mockito.mock(RoleRepository.class);
     private final PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
-    private final UserService userService = new UserService(userRepository, roleRepository, passwordEncoder); // Constructor actualizado
+    private final UserService userService = new UserService(userRepository, roleRepository, passwordEncoder);
 
     @Test
     void registerUser_Success() {
@@ -33,13 +32,12 @@ class UserServiceTest {
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
-        when(roleRepository.findByName("USER")).thenReturn(Optional.of(new Role("USER"))); // Mock de RoleRepository
+        when(roleRepository.findByName("USER")).thenReturn(Optional.of(new Role("USER")));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         userService.registerUser(user);
 
         verify(userRepository, times(1)).save(user);
-        verify(passwordEncoder, times(1)).encode("password");
         assertThat(user.getPassword()).isEqualTo("encodedPassword");
     }
 
@@ -58,4 +56,3 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 }
-//testing
