@@ -7,7 +7,7 @@ Digital Money House es una billetera virtual diseñada para ofrecer una experien
 
 ## 🚀 Funcionalidades Implementadas  
 
-### 🔒 Gestión de Usuario (Sprint 1)  
+## 🔒 Gestión de Usuario (Sprint 1 Completado)  
 
 - **Registro de Usuario**  
   - Autogeneración de CVU (22 dígitos) y alias (3 palabras separadas por puntos).  
@@ -25,7 +25,7 @@ Digital Money House es una billetera virtual diseñada para ofrecer una experien
 
 ---
 
-## 🌱 Nuevas Funcionalidades (Sprint 2 - 19/11/2024)  
+## 🌱 Datos User y Card (Sprint 2 Completado)  
 
 ### 📊 Dashboard  
 
@@ -78,7 +78,7 @@ VALUES
 (1, -50.00, '2024-11-15', 'Compra en línea');
 ```
 ---
-### 🔥 API ENDPOITS (funciona insertando el bearer token)
+### 🔥👤 API ENDPOITS USERS (funciona insertando el bearer token)
 
 - **GET http://localhost:8080/api/users/{id}**: Obtener User por ID
 
@@ -105,6 +105,120 @@ VALUES
   "cvu": "1234567890123456789012",
   "alias": "nuevo.alias"
 ```
+
+
+### 🔥💳 API ENDPOITS CARDS (funciona insertando el bearer token)
+
+
+- **POST http://localhost:8080/accounts/{id}/cards**: Agregar Tarjeta
+
+```🆗 Datos a Ingresar Para Hacer POST
+{
+  "cardNumber": "6543210987654321",
+  "cardHolderName": "Carlos López",
+  "cardType": "Crédito"
+}
+```
+
+```🆗 Respuestsa esperada 
+{
+  "id": 3,
+  "cardNumber": "6543210987654321",
+  "cardHolderName": "Carlos López",
+  "cardType": "Crédito"
+}
+```
+
+- **GET http://localhost:8080/accounts/{id}/cards**: Obtener Tarjetas Asociadas
+
+```🆗 Salida JSON espera 200 OK
+[
+  {
+    "id": 1,
+    "cardNumber": "1234567890123456",
+    "cardHolderName": "Juan Pérez",
+    "cardType": "Crédito"
+  },
+  {
+    "id": 2,
+    "cardNumber": "9876543210987654",
+    "cardHolderName": "María García",
+    "cardType": "Débito"
+  }
+]
+```
+
+- **GET http://localhost:8080/accounts/{accountId}/cards/{cardId}**: Obtener Detalle De Tarjeta Específica
+
+```🆗 Salida JSON espera 200 OK
+{
+  "id": 1,
+  "cardNumber": "1234567890123456",
+  "cardHolderName": "Juan Pérez",
+  "cardType": "Crédito"
+}
+```
+
+- **DELETE http://localhost:8080/accounts/{accountId}/cards/{cardId}**: Eliminar Tarjeta 
+
+```🆗 Salida JSON espera 200 OK
+{
+  "message": "Card deleted successfully"
+}
+```
+
+## 🎮 Gestión de Actividad Reciente (Sprint 3 Completado)
+
+- **GET http://localhost:8080/accounts/{id}/activity**: Obtener Actividad Reciente
+
+```🆗 Salida JSON espera 200 OK
+[
+  {
+    "id": 1,
+    "amount": -200.00,
+    "date": "2024-11-19T12:00:00",
+    "description": "Compra supermercado"
+  },
+  {
+    "id": 2,
+    "amount": 500.00,
+    "date": "2024-11-18T15:00:00",
+    "description": "Pago depósito"
+  }
+]
+```
+
+- **GET http://localhost:8080/accounts/{accountId}/activity/{transactionId}**: Obtener Detalles De Una Actividad
+
+```🆗 Salida JSON espera 200 OK
+{
+  "id": 1,
+  "amount": -200.00,
+  "date": "2024-11-19T12:00:00",
+  "description": "Compra supermercado"
+}
+```
+
+- **POST http://localhost:8080/accounts/{id}/transferences**: Ingresar Dinero
+
+### Parámetros en el Body (URL encoded):
+
+amount: Monto a ingresar (ej. 1000).
+description: Descripción de la transacción (ej. "Depósito en cuenta").
+```🆗 Salida JSON espera 200 OK
+{
+  "id": 10,
+  "description": "Depósito en cuenta",
+  "amount": 1000.00,
+  "date": "2024-11-19T12:00:00",
+  "account": {
+    "id": 1,
+    "accountNumber": "123456789",
+    "balance": 2000.00
+  }
+}
+```
+
 
 
 
