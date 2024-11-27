@@ -166,7 +166,7 @@ VALUES
   "message": "Card deleted successfully"
 }
 ```
-
+---
 ## 🎮 Gestión de Actividad Reciente (Sprint 3 Completado)
 
 - **GET http://localhost:8080/accounts/{id}/activity**: Obtener Actividad Reciente
