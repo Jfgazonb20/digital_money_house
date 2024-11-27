@@ -15,7 +15,19 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
+    // Obtener las últimas 5 transacciones
     public List<Transaction> getLastFiveTransactions(Long accountId) {
         return transactionRepository.findTop5ByAccountIdOrderByDateDesc(accountId);
+    }
+
+    // Obtener todas las actividades de una cuenta
+    public List<Transaction> getAllTransactionsByAccountId(Long accountId) {
+        return transactionRepository.findByAccountIdOrderByDateDesc(accountId);
+    }
+
+    // Obtener el detalle de una transacción específica
+    public Transaction getTransactionById(Long transactionId) {
+        return transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionId));
     }
 }
