@@ -9,9 +9,12 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-    // Buscar cuenta por ID (ya existente)
+    // Buscar cuenta por ID
     Optional<Account> findById(Long id);
 
-    // Nuevo: Buscar cuenta por CVU o Alias
+    // Buscar cuenta por CVU o Alias
     Optional<Account> findByCvuOrAlias(String cvu, String alias);
+
+    // Nuevo: Buscar cuenta por Usuario
+    Optional<Account> findByUserId(Long userId);
 }

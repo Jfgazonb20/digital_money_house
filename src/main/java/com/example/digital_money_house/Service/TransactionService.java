@@ -1,5 +1,6 @@
 package com.example.digital_money_house.Service;
 
+import com.example.digital_money_house.Exception.ResourceNotFoundException;
 import com.example.digital_money_house.Model.Transaction;
 import com.example.digital_money_house.Repository.TransactionRepository;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class TransactionService {
     // Obtener el detalle de una transacción específica
     public Transaction getTransactionById(Long transactionId) {
         return transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada con ID: " + transactionId));
     }
 }
+

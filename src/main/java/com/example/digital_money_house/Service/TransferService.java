@@ -34,32 +34,44 @@ public class TransferService {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
+        if (destinationCvuOrAlias == null || destinationCvuOrAlias.isBlank()) {
+            throw new IllegalArgumentException("El CVU o Alias del destinatario no puede estar vacío");
+        }
+
+        // Obtener cuenta origen
         Account sourceAccount = accountRepository.findById(sourceAccountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cuenta origen no encontrada con ID: " + sourceAccountId));
 
+        // Obtener cuenta destino
         Account destinationAccount = accountRepository.findByCvuOrAlias(destinationCvuOrAlias, destinationCvuOrAlias)
                 .orElseThrow(() -> new ResourceNotFoundException("Cuenta destino no encontrada con CVU/Alias: " + destinationCvuOrAlias));
 
         if (sourceAccount.getBalance() < amount) {
-            throw new IllegalArgumentException("Fondos insuficientes");
+            throw new IllegalArgumentException("Fondos insuficientes para realizar la transferencia");
         }
 
-        // Restar saldo a la cuenta origen
+        // Actualizar saldos
         sourceAccount.setBalance(sourceAccount.getBalance() - amount);
-        accountRepository.save(sourceAccount);
-
-        // Sumar saldo a la cuenta destino
         destinationAccount.setBalance(destinationAccount.getBalance() + amount);
+        accountRepository.save(sourceAccount);
         accountRepository.save(destinationAccount);
 
-        // Registrar transacción
-        Transaction transaction = new Transaction();
-        transaction.setAccount(sourceAccount);
-        transaction.setAmount(-amount);
-        transaction.setDate(LocalDateTime.now());
-        transaction.setDescription(description + " -> " + destinationAccount.getAlias());
-        transactionRepository.save(transaction);
+        // Registrar transacción en cuenta origen
+        Transaction sourceTransaction = new Transaction();
+        sourceTransaction.setAccount(sourceAccount);
+        sourceTransaction.setAmount(-amount);
+        sourceTransaction.setDate(LocalDateTime.now());
+        sourceTransaction.setDescription("Transferencia a -> " + destinationAccount.getAlias());
+        transactionRepository.save(sourceTransaction);
 
-        return transaction;
+        // Registrar transacción en cuenta destino
+        Transaction destinationTransaction = new Transaction();
+        destinationTransaction.setAccount(destinationAccount);
+        destinationTransaction.setAmount(amount);
+        destinationTransaction.setDate(LocalDateTime.now());
+        destinationTransaction.setDescription("Transferencia recibida de -> " + sourceAccount.getAlias());
+        transactionRepository.save(destinationTransaction);
+
+        return sourceTransaction;
     }
 }

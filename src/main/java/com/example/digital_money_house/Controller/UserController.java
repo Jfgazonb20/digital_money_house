@@ -37,8 +37,6 @@ public class UserController {
         User updatedUser = userService.updateUser(id, updatedUserData);
         return ResponseEntity.ok(updatedUser);
     }
-
-
     @GetMapping("/protected")
     public ResponseEntity<String> getProtectedData() {
         return ResponseEntity.ok("Esta es información protegida.");

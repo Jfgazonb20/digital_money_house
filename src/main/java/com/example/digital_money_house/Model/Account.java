@@ -11,16 +11,23 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String accountNumber;
-    private Double balance;
-
-    // Atributo alias
     @Column(unique = true, nullable = false)
-    private String alias;
+    private String accountNumber; // Número de cuenta único
 
-    // Nuevo atributo CVU
+    @Column(nullable = false)
+    private Double balance; // Saldo de la cuenta
+
+    @Column(unique = true, nullable = false)
+    private String alias; // Alias único de la cuenta
+
     @Column(unique = true, nullable = false, length = 22)
-    private String cvu;
+    private String cvu; // CVU único de 22 dígitos
+
+    // Relación con el usuario
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     // Getters y Setters (si no usas Lombok)
     public Long getId() {
         return id;
@@ -60,5 +67,13 @@ public class Account {
 
     public void setCvu(String cvu) {
         this.cvu = cvu;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
