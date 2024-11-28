@@ -1,11 +1,10 @@
 package com.example.digital_money_house.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 public class Account {
 
     @Id
@@ -15,7 +14,14 @@ public class Account {
     private String accountNumber;
     private Double balance;
 
-    // Getters y Setters
+    // Atributo alias
+    @Column(unique = true, nullable = false)
+    private String alias;
+
+    // Nuevo atributo CVU
+    @Column(unique = true, nullable = false, length = 22)
+    private String cvu;
+    // Getters y Setters (si no usas Lombok)
     public Long getId() {
         return id;
     }
@@ -38,5 +44,21 @@ public class Account {
 
     public void setBalance(Double balance) {
         this.balance = balance;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getCvu() {
+        return cvu;
+    }
+
+    public void setCvu(String cvu) {
+        this.cvu = cvu;
     }
 }

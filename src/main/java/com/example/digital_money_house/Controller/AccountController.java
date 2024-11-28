@@ -15,8 +15,7 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    // Endpoint para ingresar dinero
-    @PostMapping("/{id}/transferences")
+    @PostMapping("/{id}/deposit")
     public ResponseEntity<Transaction> depositMoney(
             @PathVariable Long id,
             @RequestParam Double amount,
