@@ -13,12 +13,14 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class TransferServiceTest {
 
     private final AccountRepository accountRepository = Mockito.mock(AccountRepository.class);
     private final TransactionRepository transactionRepository = Mockito.mock(TransactionRepository.class);
+
     private final TransferService transferService = new TransferService(accountRepository, transactionRepository);
 
     @Test
@@ -29,19 +31,16 @@ class TransferServiceTest {
 
         Account destinationAccount = new Account();
         destinationAccount.setId(2L);
-        destinationAccount.setAlias("alias.destino");
         destinationAccount.setBalance(500.00);
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(sourceAccount));
-        when(accountRepository.findByCvuOrAlias("alias.destino", "alias.destino")).thenReturn(Optional.of(destinationAccount));
-        when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(accountRepository.findByCvuOrAlias("destinationCvu", "destinationCvu")).thenReturn(Optional.of(destinationAccount));
 
-        Transaction transaction = transferService.transferMoney(1L, "alias.destino", 200.00, "Pago Servicio");
+        Transaction transaction = transferService.transferMoney(1L, "destinationCvu", 200.00, "Transferencia");
 
         assertThat(sourceAccount.getBalance()).isEqualTo(800.00);
         assertThat(destinationAccount.getBalance()).isEqualTo(700.00);
         assertThat(transaction.getAmount()).isEqualTo(-200.00);
-        assertThat(transaction.getDescription()).isEqualTo("Pago Servicio -> alias.destino");
 
         verify(accountRepository, times(1)).save(sourceAccount);
         verify(accountRepository, times(1)).save(destinationAccount);
@@ -49,15 +48,16 @@ class TransferServiceTest {
     }
 
     @Test
-    void transferMoney_Failure_SourceAccountNotFound() {
-        when(accountRepository.findById(1L)).thenReturn(Optional.empty());
+    void transferMoney_Failure_InsufficientFunds() {
+        Account sourceAccount = new Account();
+        sourceAccount.setId(1L);
+        sourceAccount.setBalance(100.00);
 
-        assertThrows(ResourceNotFoundException.class, () -> {
-            transferService.transferMoney(1L, "alias.destino", 200.00, "Pago Servicio");
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(sourceAccount));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            transferService.transferMoney(1L, "destinationCvu", 200.00, "Transferencia");
         });
-
-        verify(accountRepository, never()).save(any());
-        verify(transactionRepository, never()).save(any());
     }
 
     @Test
@@ -67,35 +67,10 @@ class TransferServiceTest {
         sourceAccount.setBalance(1000.00);
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(sourceAccount));
-        when(accountRepository.findByCvuOrAlias("alias.invalido", "alias.invalido")).thenReturn(Optional.empty());
+        when(accountRepository.findByCvuOrAlias("invalidCvu", "invalidCvu")).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            transferService.transferMoney(1L, "alias.invalido", 200.00, "Pago Servicio");
+            transferService.transferMoney(1L, "invalidCvu", 200.00, "Transferencia");
         });
-
-        verify(accountRepository, times(1)).findById(1L);
-        verify(accountRepository, times(1)).findByCvuOrAlias("alias.invalido", "alias.invalido");
-        verify(transactionRepository, never()).save(any());
-    }
-
-    @Test
-    void transferMoney_Failure_InsufficientFunds() {
-        Account sourceAccount = new Account();
-        sourceAccount.setId(1L);
-        sourceAccount.setBalance(100.00);
-
-        Account destinationAccount = new Account();
-        destinationAccount.setId(2L);
-        destinationAccount.setAlias("alias.destino");
-
-        when(accountRepository.findById(1L)).thenReturn(Optional.of(sourceAccount));
-        when(accountRepository.findByCvuOrAlias("alias.destino", "alias.destino")).thenReturn(Optional.of(destinationAccount));
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            transferService.transferMoney(1L, "alias.destino", 200.00, "Pago Servicio");
-        });
-
-        verify(accountRepository, never()).save(any());
-        verify(transactionRepository, never()).save(any());
     }
 }

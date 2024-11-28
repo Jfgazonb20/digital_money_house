@@ -39,5 +39,6 @@ class CardControllerTest {
         ResponseEntity<Card> response = cardController.addCard(1L, card);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody()).isEqualTo(card);
     }
 }
