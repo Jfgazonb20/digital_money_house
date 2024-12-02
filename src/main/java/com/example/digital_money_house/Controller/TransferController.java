@@ -17,6 +17,7 @@ public class TransferController {
         this.transferService = transferService;
     }
 
+    // Endpoint para realizar transferencia
     @PostMapping("/{id}/transferences")
     public ResponseEntity<Transaction> transferMoney(
             @PathVariable Long id,
@@ -27,10 +28,10 @@ public class TransferController {
         return ResponseEntity.ok(transaction);
     }
 
-    @GetMapping("/{id}/transferences")
+    // Endpoint para obtener transferencias recientes
+    @GetMapping("/{id}/transferences/recent")
     public ResponseEntity<List<Transaction>> getRecentTransfers(@PathVariable Long id) {
         List<Transaction> transactions = transferService.getRecentTransfers(id);
         return ResponseEntity.ok(transactions);
     }
 }
-

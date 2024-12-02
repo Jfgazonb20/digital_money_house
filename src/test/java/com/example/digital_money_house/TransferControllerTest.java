@@ -31,7 +31,7 @@ class TransferControllerTest {
         ResponseEntity<List<Transaction>> response = transferController.getRecentTransfers(1L);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
-        assertThat(response.getBody().size()).isEqualTo(1);
+        assertThat(response.getBody()).hasSize(1);
         assertThat(response.getBody().get(0).getDescription()).isEqualTo("Pago Servicio -> alias.destino");
 
         verify(transferService, times(1)).getRecentTransfers(1L);

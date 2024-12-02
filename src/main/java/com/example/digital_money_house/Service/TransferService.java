@@ -22,56 +22,46 @@ public class TransferService {
         this.transactionRepository = transactionRepository;
     }
 
-    // Obtener destinatarios recientes
-    public List<Transaction> getRecentTransfers(Long accountId) {
-        return transactionRepository.findTop5ByAccountIdOrderByDateDesc(accountId);
-    }
-
-    // Realizar transferencia
     @Transactional
     public Transaction transferMoney(Long sourceAccountId, String destinationCvuOrAlias, Double amount, String description) {
         if (amount <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        if (destinationCvuOrAlias == null || destinationCvuOrAlias.isBlank()) {
-            throw new IllegalArgumentException("El CVU o Alias del destinatario no puede estar vacío");
-        }
-
-        // Obtener cuenta origen
         Account sourceAccount = accountRepository.findById(sourceAccountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cuenta origen no encontrada con ID: " + sourceAccountId));
 
-        // Obtener cuenta destino
+        // Asegurarse de que la cuenta origen tenga fondos suficientes antes de buscar la cuenta destino.
+        if (sourceAccount.getBalance() < amount) {
+            throw new IllegalArgumentException("Fondos insuficientes");
+        }
+
         Account destinationAccount = accountRepository.findByCvuOrAlias(destinationCvuOrAlias, destinationCvuOrAlias)
                 .orElseThrow(() -> new ResourceNotFoundException("Cuenta destino no encontrada con CVU/Alias: " + destinationCvuOrAlias));
-
-        if (sourceAccount.getBalance() < amount) {
-            throw new IllegalArgumentException("Fondos insuficientes para realizar la transferencia");
-        }
 
         // Actualizar saldos
         sourceAccount.setBalance(sourceAccount.getBalance() - amount);
         destinationAccount.setBalance(destinationAccount.getBalance() + amount);
+
         accountRepository.save(sourceAccount);
         accountRepository.save(destinationAccount);
 
-        // Registrar transacción en cuenta origen
-        Transaction sourceTransaction = new Transaction();
-        sourceTransaction.setAccount(sourceAccount);
-        sourceTransaction.setAmount(-amount);
-        sourceTransaction.setDate(LocalDateTime.now());
-        sourceTransaction.setDescription("Transferencia a -> " + destinationAccount.getAlias());
-        transactionRepository.save(sourceTransaction);
+        // Registrar transacción
+        Transaction transaction = new Transaction();
+        transaction.setAccount(sourceAccount);
+        transaction.setAmount(-amount);
+        transaction.setDate(LocalDateTime.now());
+        transaction.setDescription(description + " -> " + destinationAccount.getAlias());
 
-        // Registrar transacción en cuenta destino
-        Transaction destinationTransaction = new Transaction();
-        destinationTransaction.setAccount(destinationAccount);
-        destinationTransaction.setAmount(amount);
-        destinationTransaction.setDate(LocalDateTime.now());
-        destinationTransaction.setDescription("Transferencia recibida de -> " + sourceAccount.getAlias());
-        transactionRepository.save(destinationTransaction);
+        transactionRepository.save(transaction);
 
-        return sourceTransaction;
+        return transaction;
+    }
+
+    public List<Transaction> getRecentTransfers(Long accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + accountId));
+
+        return transactionRepository.findTop5ByAccountIdOrderByDateDesc(account.getId());
     }
 }

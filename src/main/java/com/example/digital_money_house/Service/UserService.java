@@ -44,10 +44,8 @@ public class UserService {
             throw new UserAlreadyExistsException("El email ya está registrado");
         }
 
-        // Validar que el CVU y alias no existan
-        if (accountRepository.findByCvuOrAlias(user.getCvu(), user.getAlias()).isPresent()) {
-            throw new UserAlreadyExistsException("El CVU o alias ya está registrado");
-        }
+        // Validar CVU y Alias
+        validateCvuAndAlias(user);
 
         // Encriptar contraseña
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -62,14 +60,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         // Crear automáticamente una cuenta vinculada
-        Account account = new Account();
-        account.setAccountNumber(generateAccountNumber());
-        account.setBalance(0.0); // Saldo inicial
-        account.setCvu(user.getCvu()); // Usar el CVU proporcionado
-        account.setAlias(user.getAlias()); // Usar el alias proporcionado
-        account.setUser(savedUser); // Asociar la cuenta al usuario
-
-        accountRepository.save(account);
+        createAccountForUser(savedUser, user.getCvu(), user.getAlias());
     }
 
     public User getUserById(Long id) {
@@ -96,6 +87,23 @@ public class UserService {
 
         userRepository.save(user);
         return user;
+    }
+
+    private void validateCvuAndAlias(User user) {
+        if (accountRepository.findByCvuOrAlias(user.getCvu(), user.getAlias()).isPresent()) {
+            throw new UserAlreadyExistsException("El CVU o alias ya está registrado");
+        }
+    }
+
+    private void createAccountForUser(User user, String cvu, String alias) {
+        Account account = new Account();
+        account.setAccountNumber(generateAccountNumber());
+        account.setBalance(0.0); // Saldo inicial
+        account.setCvu(cvu); // Usar el CVU proporcionado
+        account.setAlias(alias); // Usar el alias proporcionado
+        account.setUser(user); // Asociar la cuenta al usuario
+
+        accountRepository.save(account);
     }
 
     private String generateAccountNumber() {

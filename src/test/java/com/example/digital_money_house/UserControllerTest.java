@@ -1,6 +1,7 @@
 package com.example.digital_money_house;
 
 import com.example.digital_money_house.Controller.UserController;
+import com.example.digital_money_house.Exception.UserAlreadyExistsException;
 import com.example.digital_money_house.Model.User;
 import com.example.digital_money_house.Service.UserService;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class UserControllerTest {
         User user = new User();
         user.setUsername("testuser");
 
-        doThrow(new RuntimeException("El nombre de usuario ya existe")).when(userService).registerUser(user);
+        doThrow(new UserAlreadyExistsException("El nombre de usuario ya existe")).when(userService).registerUser(user);
 
         ResponseEntity<String> response = userController.registerUser(user);
 
