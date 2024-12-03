@@ -1,7 +1,7 @@
 # Usar una imagen base de Java
 FROM openjdk:17-jdk-slim
 
-# Información de los autores (pipe sprint 3)
+# Información de los autores (Completado)
 LABEL authors="jfgaz"
 
 # Establecer el directorio de trabajo dentro del contenedor
