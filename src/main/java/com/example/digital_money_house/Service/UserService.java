@@ -8,12 +8,12 @@ import com.example.digital_money_house.Model.User;
 import com.example.digital_money_house.Repository.AccountRepository;
 import com.example.digital_money_house.Repository.RoleRepository;
 import com.example.digital_money_house.Repository.UserRepository;
+import com.example.digital_money_house.Util.AliasGenerator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -34,18 +34,24 @@ public class UserService {
 
     @Transactional
     public void registerUser(User user) {
-        // Validar que el nombre de usuario no exista
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException("El nombre de usuario ya existe");
         }
 
-        // Validar que el email no exista
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException("El email ya está registrado");
         }
 
-        // Validar CVU y Alias
-        validateCvuAndAlias(user);
+        String alias = AliasGenerator.generateAlias();
+        String cvu = AliasGenerator.generateCvu();
+        while (accountRepository.findByCvuOrAlias(cvu, alias).isPresent()) {
+            alias = AliasGenerator.generateAlias();
+            cvu = AliasGenerator.generateCvu();
+        }
+
+        // Asignar alias y CVU al usuario
+        user.setAlias(alias);
+        user.setCvu(cvu);
 
         // Encriptar contraseña
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -60,7 +66,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         // Crear automáticamente una cuenta vinculada
-        createAccountForUser(savedUser, user.getCvu(), user.getAlias());
+        createAccountForUser(savedUser, cvu, alias);
     }
 
     public User getUserById(Long id) {
@@ -72,28 +78,30 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
 
-        // Actualizar email y validar unicidad
+        // Validar y actualizar los campos que se quieren modificar
         if (updatedUserData.getEmail() != null && !updatedUserData.getEmail().equals(user.getEmail())) {
             if (userRepository.findByEmail(updatedUserData.getEmail()).isPresent()) {
-                throw new UserAlreadyExistsException("El email ya está registrado");
+                throw new UserAlreadyExistsException("El email ya está registrado.");
             }
             user.setEmail(updatedUserData.getEmail());
         }
 
-        // Actualizar alias (si aplica)
-        if (updatedUserData.getAlias() != null) {
-            user.setAlias(updatedUserData.getAlias());
+        if (updatedUserData.getUsername() != null && !updatedUserData.getUsername().equals(user.getUsername())) {
+            if (userRepository.findByUsername(updatedUserData.getUsername()).isPresent()) {
+                throw new UserAlreadyExistsException("El nombre de usuario ya existe.");
+            }
+            user.setUsername(updatedUserData.getUsername());
         }
 
-        userRepository.save(user);
-        return user;
+        // Actualizar contraseña (si aplica)
+        if (updatedUserData.getPassword() != null && !updatedUserData.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(updatedUserData.getPassword()));
+        }
+
+        // Guardar los cambios
+        return userRepository.save(user);
     }
 
-    private void validateCvuAndAlias(User user) {
-        if (accountRepository.findByCvuOrAlias(user.getCvu(), user.getAlias()).isPresent()) {
-            throw new UserAlreadyExistsException("El CVU o alias ya está registrado");
-        }
-    }
 
     private void createAccountForUser(User user, String cvu, String alias) {
         Account account = new Account();

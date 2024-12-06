@@ -10,32 +10,32 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "app_user")  // Evitar conflicto con palabras reservadas
+@Table(name = "app_user")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull(message = "El campo 'username' es obligatorio.")
+    @NotBlank(message = "El campo 'username' no puede estar vacío.")
     @Column(unique = true)
     private String username;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "El campo 'email' es obligatorio.")
+    @Email(message = "El email debe tener un formato válido.")
     @Column(unique = true)
     private String email;
 
-    @NotBlank
+    @NotNull(message = "El campo 'password' es obligatorio.")
+    @NotBlank(message = "El campo 'password' no puede estar vacío.")
     private String password;
 
-    @NotBlank
     @Column(unique = true, length = 22)
-    private String cvu;
+    private String cvu; // Este campo será generado automáticamente.
 
-    @NotBlank
     @Column(unique = true)
-    private String alias;
+    private String alias; // Este campo será generado automáticamente.
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

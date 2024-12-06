@@ -2,9 +2,12 @@ package com.example.digital_money_house.Controller;
 
 import com.example.digital_money_house.Model.Card;
 import com.example.digital_money_house.Service.CardService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -28,9 +31,16 @@ public class CardController {
     }
 
     @PostMapping("/{id}/cards")
-    public ResponseEntity<Card> addCard(@PathVariable Long id, @RequestBody Card card) {
-        return ResponseEntity.ok(cardService.addCard(id, card));
+    public ResponseEntity<Card> addCard(@PathVariable Long id, @Valid @RequestBody Card card) {
+        Card createdCard = cardService.addCard(id, card);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{cardId}")
+                .buildAndExpand(createdCard.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(createdCard);
     }
+
 
     @DeleteMapping("/{accountId}/cards/{cardId}")
     public ResponseEntity<String> deleteCard(@PathVariable Long cardId) {

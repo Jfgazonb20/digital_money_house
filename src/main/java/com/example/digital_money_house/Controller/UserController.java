@@ -1,8 +1,10 @@
 package com.example.digital_money_house.Controller;
 
 import com.example.digital_money_house.Exception.UserAlreadyExistsException;
+import com.example.digital_money_house.Exception.ResourceNotFoundException;
 import com.example.digital_money_house.Model.User;
 import com.example.digital_money_house.Service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,26 +19,37 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
         try {
             userService.registerUser(user);
             return ResponseEntity.ok("Usuario registrado exitosamente");
         } catch (UserAlreadyExistsException e) {
-            return ResponseEntity.status(409).body(e.getMessage()); // HTTP 409 Conflict
+            return ResponseEntity.status(409).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+        try {
+            User user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(404).body(null);
+        }
     }
 
     @PatchMapping("/users/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUserData) {
-        User updatedUser = userService.updateUser(id, updatedUserData);
-        return ResponseEntity.ok(updatedUser);
+        try {
+            User updatedUser = userService.updateUser(id, updatedUserData);
+            return ResponseEntity.ok(updatedUser);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(404).body(null);
+        }
     }
+
     @GetMapping("/protected")
     public ResponseEntity<String> getProtectedData() {
         return ResponseEntity.ok("Esta es información protegida.");

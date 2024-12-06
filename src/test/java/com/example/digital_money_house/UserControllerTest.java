@@ -2,6 +2,7 @@ package com.example.digital_money_house;
 
 import com.example.digital_money_house.Controller.UserController;
 import com.example.digital_money_house.Exception.UserAlreadyExistsException;
+import com.example.digital_money_house.Exception.ResourceNotFoundException;
 import com.example.digital_money_house.Model.User;
 import com.example.digital_money_house.Service.UserService;
 import org.junit.jupiter.api.Test;
@@ -36,12 +37,28 @@ class UserControllerTest {
         User user = new User();
         user.setUsername("testuser");
 
-        doThrow(new UserAlreadyExistsException("El nombre de usuario ya existe")).when(userService).registerUser(user);
+        doThrow(new UserAlreadyExistsException("El nombre de usuario ya existe"))
+                .when(userService).registerUser(user);
 
         ResponseEntity<String> response = userController.registerUser(user);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(409);
         assertThat(response.getBody()).isEqualTo("El nombre de usuario ya existe");
+    }
+
+    @Test
+    void registerUser_Failure_BadRequest() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail(null); // Campo inválido
+
+        doThrow(new IllegalArgumentException("El email no puede estar vacío"))
+                .when(userService).registerUser(user);
+
+        ResponseEntity<String> response = userController.registerUser(user);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(400);
+        assertThat(response.getBody()).isEqualTo("El email no puede estar vacío");
     }
 
     @Test
@@ -59,6 +76,16 @@ class UserControllerTest {
     }
 
     @Test
+    void getUserById_NotFound() {
+        when(userService.getUserById(1L)).thenThrow(new ResourceNotFoundException("Usuario no encontrado con id: 1"));
+
+        ResponseEntity<User> response = userController.getUserById(1L);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(404);
+        assertThat(response.getBody()).isNull();
+    }
+
+    @Test
     void updateUser_Success() {
         User updatedUser = new User();
         updatedUser.setId(1L);
@@ -70,5 +97,16 @@ class UserControllerTest {
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody().getEmail()).isEqualTo("newemail@example.com");
+    }
+
+    @Test
+    void updateUser_NotFound() {
+        when(userService.updateUser(eq(1L), any(User.class)))
+                .thenThrow(new ResourceNotFoundException("Usuario no encontrado con id: 1"));
+
+        ResponseEntity<User> response = userController.updateUser(1L, new User());
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(404);
+        assertThat(response.getBody()).isNull();
     }
 }

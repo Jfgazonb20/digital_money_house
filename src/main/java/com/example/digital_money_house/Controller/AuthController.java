@@ -1,6 +1,5 @@
 package com.example.digital_money_house.Controller;
 
-
 import com.example.digital_money_house.Security.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,10 +37,11 @@ public class AuthController {
             return ResponseEntity.status(500).body("Error interno del servidor");
         }
     }
+
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
         try {
-            // Invalida el token (necesitamos implementar la lógica en JwtService)
+            // Invalidar el token
             jwtService.invalidateToken(token);
             return ResponseEntity.ok("Sesión cerrada exitosamente");
         } catch (Exception e) {
