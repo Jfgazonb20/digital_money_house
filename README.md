@@ -115,5 +115,9 @@ Digital Money House es una billetera virtual diseñada para ofrecer una experien
 - **JWT** (JSON Web Token): Todos los endpoints requieren autenticación mediante Bearer Token tras iniciar sesión exitosamente.
 
 ---
+## ⚠️ **Importante**
+- **AliasWords** tener presente la direccion del archivo para que pueda generar los alias.
+
+---
 
 💡 **¡Con Digital Money House, construimos una experiencia financiera segura y eficiente para todos!**
