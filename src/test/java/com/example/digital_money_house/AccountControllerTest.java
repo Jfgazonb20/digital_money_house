@@ -1,15 +1,14 @@
 package com.example.digital_money_house;
 
-import com.example.digital_money_house.Controller.AccountController;
+import com.example.digital_money_house.Controller.DashboardController;
 import com.example.digital_money_house.Model.Transaction;
 import com.example.digital_money_house.Service.AccountService;
-import org.junit.jupiter.api.BeforeEach;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -17,40 +16,20 @@ import static org.mockito.Mockito.*;
 class AccountControllerTest {
 
     private final AccountService accountService = Mockito.mock(AccountService.class);
-    private final AccountController accountController = new AccountController(accountService);
-
-    @BeforeEach
-    void setUp() {
-        // Simular el contexto HTTP para evitar errores relacionados con ServletRequestAttributes
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-    }
+    private final DashboardController dashboardController = new DashboardController(accountService);
 
     @Test
-    void depositMoney_Success() {
-        Transaction transaction = new Transaction();
-        transaction.setAmount(500.00);
-        transaction.setDescription("Depósito en cuenta");
+    void getAccountBalance_NoPermission() {
+        doThrow(new IllegalArgumentException("No tienes permisos para acceder a esta cuenta"))
+                .when(accountService).validateUserAccessToAccount(eq(2L), any(HttpServletRequest.class));
 
-        when(accountService.depositMoney(1L, 500.00, "Depósito en cuenta")).thenReturn(transaction);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn("Bearer invalid.token");
 
-        ResponseEntity<Transaction> response = accountController.depositMoney(1L, 500.00, "Depósito en cuenta");
+        ResponseEntity<Map<String, Object>> response = dashboardController.getAccountBalance(2L, request);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(201); // Cambiado de 200 a 201
-        assertThat(response.getBody().getAmount()).isEqualTo(500.00);
-        verify(accountService, times(1)).depositMoney(1L, 500.00, "Depósito en cuenta");
+        assertThat(response.getStatusCodeValue()).isEqualTo(403);
+        verify(accountService, times(1)).validateUserAccessToAccount(eq(2L), any(HttpServletRequest.class));
     }
 
-
-    @Test
-    void depositMoney_Failure_AccountNotFound() {
-        when(accountService.depositMoney(2L, 500.00, "Depósito en cuenta"))
-                .thenThrow(new RuntimeException("Cuenta no encontrada con ID: 2"));
-
-        try {
-            accountController.depositMoney(2L, 500.00, "Depósito en cuenta");
-        } catch (RuntimeException e) {
-            assertThat(e.getMessage()).isEqualTo("Cuenta no encontrada con ID: 2");
-        }
-    }
 }

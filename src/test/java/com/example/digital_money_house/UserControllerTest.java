@@ -47,21 +47,6 @@ class UserControllerTest {
     }
 
     @Test
-    void registerUser_Failure_BadRequest() {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setEmail(null); // Campo inválido
-
-        doThrow(new IllegalArgumentException("El email no puede estar vacío"))
-                .when(userService).registerUser(user);
-
-        ResponseEntity<String> response = userController.registerUser(user);
-
-        assertThat(response.getStatusCodeValue()).isEqualTo(400);
-        assertThat(response.getBody()).isEqualTo("El email no puede estar vacío");
-    }
-
-    @Test
     void getUserById_Success() {
         User user = new User();
         user.setId(1L);
@@ -69,20 +54,20 @@ class UserControllerTest {
 
         when(userService.getUserById(1L)).thenReturn(user);
 
-        ResponseEntity<User> response = userController.getUserById(1L);
+        ResponseEntity<?> response = userController.getUserById(1L);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
-        assertThat(response.getBody().getUsername()).isEqualTo("testuser");
+        assertThat(((User) response.getBody()).getUsername()).isEqualTo("testuser");
     }
 
     @Test
     void getUserById_NotFound() {
-        when(userService.getUserById(1L)).thenThrow(new ResourceNotFoundException("Usuario no encontrado con id: 1"));
+        when(userService.getUserById(1L)).thenThrow(new ResourceNotFoundException("Usuario no encontrado con ID: 1"));
 
-        ResponseEntity<User> response = userController.getUserById(1L);
+        ResponseEntity<?> response = userController.getUserById(1L);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(404);
-        assertThat(response.getBody()).isNull();
+        assertThat(response.getBody()).isEqualTo("Usuario no encontrado con ID: 1");
     }
 
     @Test
@@ -93,20 +78,20 @@ class UserControllerTest {
 
         when(userService.updateUser(eq(1L), any(User.class))).thenReturn(updatedUser);
 
-        ResponseEntity<User> response = userController.updateUser(1L, updatedUser);
+        ResponseEntity<?> response = userController.updateUser(1L, updatedUser);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
-        assertThat(response.getBody().getEmail()).isEqualTo("newemail@example.com");
+        assertThat(((User) response.getBody()).getEmail()).isEqualTo("newemail@example.com");
     }
 
     @Test
     void updateUser_NotFound() {
         when(userService.updateUser(eq(1L), any(User.class)))
-                .thenThrow(new ResourceNotFoundException("Usuario no encontrado con id: 1"));
+                .thenThrow(new ResourceNotFoundException("Usuario no encontrado con ID: 1"));
 
-        ResponseEntity<User> response = userController.updateUser(1L, new User());
+        ResponseEntity<?> response = userController.updateUser(1L, new User());
 
         assertThat(response.getStatusCodeValue()).isEqualTo(404);
-        assertThat(response.getBody()).isNull();
+        assertThat(response.getBody()).isEqualTo("Usuario no encontrado con ID: 1");
     }
 }

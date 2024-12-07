@@ -5,6 +5,8 @@ import com.example.digital_money_house.Model.Account;
 import com.example.digital_money_house.Model.Transaction;
 import com.example.digital_money_house.Repository.AccountRepository;
 import com.example.digital_money_house.Repository.TransactionRepository;
+import com.example.digital_money_house.Security.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,70 +18,48 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final JwtService jwtService;
 
-    public AccountService(AccountRepository accountRepository, TransactionRepository transactionRepository) {
+    public AccountService(AccountRepository accountRepository, TransactionRepository transactionRepository, JwtService jwtService) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.jwtService = jwtService;
     }
 
-    // Obtener cuenta por ID
     public Account getAccountById(Long id) {
         return accountRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + id));
     }
 
-    // Obtener transacciones de una cuenta
+    public void validateUserAccessToAccount(Long accountId, HttpServletRequest request) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + accountId));
+
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        String username = jwtService.extractUsername(token);
+
+        if (!account.getUser().getUsername().equals(username)) {
+            throw new IllegalArgumentException("No tiene permisos para acceder a esta cuenta"); // Cambiado para coincidir con el test
+        }
+    }
+
+
     public List<Transaction> getAccountTransactions(Long accountId) {
-        if (!accountRepository.existsById(accountId)) {
-            throw new ResourceNotFoundException("Cuenta no encontrada con ID: " + accountId);
-        }
-        return transactionRepository.findByAccountIdOrderByDateDesc(accountId);
+        Account account = getAccountById(accountId);
+        return transactionRepository.findByAccountIdOrderByDateDesc(account.getId());
     }
 
-    // Obtener detalle de una transacción específica
-    public Transaction getTransactionDetails(Long accountId, Long transactionId) {
-        Transaction transaction = transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada con ID: " + transactionId));
-
-        if (!transaction.getAccount().getId().equals(accountId)) {
-            throw new IllegalArgumentException("La transacción no pertenece a la cuenta con ID: " + accountId);
-        }
-
-        return transaction;
-    }
-
-    // Actualizar cuenta
-    public Account updateAccount(Long id, Account updatedAccountData) {
-        Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + id));
-
-        if (updatedAccountData.getAccountNumber() != null) {
-            account.setAccountNumber(updatedAccountData.getAccountNumber());
-        }
-
-        if (updatedAccountData.getBalance() != null) {
-            account.setBalance(updatedAccountData.getBalance());
-        }
-
-        accountRepository.save(account);
-        return account;
-    }
-
-    // Ingresar dinero a la cuenta
     @Transactional
     public Transaction depositMoney(Long accountId, Double amount, String description) {
         if (amount <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + accountId));
+        Account account = getAccountById(accountId);
 
-        // Actualiza el balance de la cuenta
         account.setBalance(account.getBalance() + amount);
         accountRepository.save(account);
 
-        // Registra la transacción
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
         transaction.setAmount(amount);

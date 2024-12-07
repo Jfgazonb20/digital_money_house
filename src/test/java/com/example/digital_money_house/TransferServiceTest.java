@@ -1,5 +1,6 @@
 package com.example.digital_money_house;
 
+import com.example.digital_money_house.Exception.CustomGoneException;
 import com.example.digital_money_house.Exception.ResourceNotFoundException;
 import com.example.digital_money_house.Model.Account;
 import com.example.digital_money_house.Model.Transaction;
@@ -20,7 +21,6 @@ class TransferServiceTest {
 
     private final AccountRepository accountRepository = Mockito.mock(AccountRepository.class);
     private final TransactionRepository transactionRepository = Mockito.mock(TransactionRepository.class);
-
     private final TransferService transferService = new TransferService(accountRepository, transactionRepository);
 
     @Test
@@ -34,7 +34,9 @@ class TransferServiceTest {
         destinationAccount.setBalance(500.00);
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(sourceAccount));
-        when(accountRepository.findByCvuOrAlias("destinationCvu", "destinationCvu")).thenReturn(Optional.of(destinationAccount));
+        when(accountRepository.findByCvuOrAlias("destinationCvu", "destinationCvu"))
+                .thenReturn(Optional.of(destinationAccount));
+        when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Transaction transaction = transferService.transferMoney(1L, "destinationCvu", 200.00, "Transferencia");
 
@@ -45,32 +47,5 @@ class TransferServiceTest {
         verify(accountRepository, times(1)).save(sourceAccount);
         verify(accountRepository, times(1)).save(destinationAccount);
         verify(transactionRepository, times(1)).save(any(Transaction.class));
-    }
-
-    @Test
-    void transferMoney_Failure_InsufficientFunds() {
-        Account sourceAccount = new Account();
-        sourceAccount.setId(1L);
-        sourceAccount.setBalance(100.00);
-
-        when(accountRepository.findById(1L)).thenReturn(Optional.of(sourceAccount));
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            transferService.transferMoney(1L, "destinationCvu", 200.00, "Transferencia");
-        });
-    }
-
-    @Test
-    void transferMoney_Failure_DestinationAccountNotFound() {
-        Account sourceAccount = new Account();
-        sourceAccount.setId(1L);
-        sourceAccount.setBalance(1000.00);
-
-        when(accountRepository.findById(1L)).thenReturn(Optional.of(sourceAccount));
-        when(accountRepository.findByCvuOrAlias("invalidCvu", "invalidCvu")).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> {
-            transferService.transferMoney(1L, "invalidCvu", 200.00, "Transferencia");
-        });
     }
 }

@@ -31,22 +31,22 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             User user = userService.getUserById(id);
             return ResponseEntity.ok(user);
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(404).body(null);
+            return ResponseEntity.status(404).body("Usuario no encontrado con ID: " + id);
         }
     }
 
     @PatchMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUserData) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUserData) {
         try {
             User updatedUser = userService.updateUser(id, updatedUserData);
             return ResponseEntity.ok(updatedUser);
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(404).body(null);
+            return ResponseEntity.status(404).body("Usuario no encontrado con ID: " + id);
         }
     }
 

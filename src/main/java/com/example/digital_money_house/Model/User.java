@@ -45,6 +45,11 @@ public class User {
     )
     private Set<Role> roles;
 
+    // Constructor adicional para inicializar campos específicos
+    public User(String username) {
+        this.username = username;
+    }
+
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
