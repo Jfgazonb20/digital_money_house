@@ -1,5 +1,6 @@
 package com.example.digital_money_house.Controller;
 
+import com.example.digital_money_house.Exception.ResourceNotFoundException;
 import com.example.digital_money_house.Model.Card;
 import com.example.digital_money_house.Service.CardService;
 import jakarta.validation.Valid;
@@ -26,8 +27,9 @@ public class CardController {
     }
 
     @GetMapping("/{accountId}/cards/{cardId}")
-    public ResponseEntity<Card> getCardById(@PathVariable Long cardId) {
-        return ResponseEntity.ok(cardService.getCardById(cardId));
+    public ResponseEntity<Card> getCardById(@PathVariable Long accountId, @PathVariable Long cardId) {
+        Card card = cardService.getCardByIdAndAccountId(accountId, cardId);
+        return ResponseEntity.ok(card);
     }
 
     @PostMapping("/{id}/cards")
@@ -41,10 +43,9 @@ public class CardController {
         return ResponseEntity.created(location).body(createdCard);
     }
 
-
     @DeleteMapping("/{accountId}/cards/{cardId}")
-    public ResponseEntity<String> deleteCard(@PathVariable Long cardId) {
-        cardService.deleteCard(cardId);
+    public ResponseEntity<String> deleteCard(@PathVariable Long accountId, @PathVariable Long cardId) {
+        cardService.deleteCard(accountId, cardId);
         return ResponseEntity.ok("Card deleted successfully");
     }
 }

@@ -57,4 +57,24 @@ class AccountServiceTest {
             accountService.depositMoney(1L, -100.00, "Depósito en cuenta");
         });
     }
+
+    @Test
+    void getAccountTransactions_Success() {
+        Account account = new Account();
+        account.setId(1L);
+
+        when(accountRepository.existsById(1L)).thenReturn(true);
+        accountService.getAccountTransactions(1L);
+
+        verify(transactionRepository, times(1)).findByAccountIdOrderByDateDesc(1L);
+    }
+
+    @Test
+    void getAccountTransactions_Failure_AccountNotFound() {
+        when(accountRepository.existsById(2L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            accountService.getAccountTransactions(2L);
+        });
+    }
 }

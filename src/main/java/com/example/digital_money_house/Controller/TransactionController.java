@@ -1,6 +1,7 @@
 package com.example.digital_money_house.Controller;
 
 import com.example.digital_money_house.Model.Transaction;
+import com.example.digital_money_house.Service.AccountService;
 import com.example.digital_money_house.Service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,11 @@ import java.util.List;
 @RequestMapping("/accounts")
 public class TransactionController {
 
+    private final AccountService accountService;
     private final TransactionService transactionService;
 
-    public TransactionController(TransactionService transactionService) {
+    public TransactionController(AccountService accountService, TransactionService transactionService) {
+        this.accountService = accountService;
         this.transactionService = transactionService;
     }
 
@@ -28,6 +31,7 @@ public class TransactionController {
     @GetMapping("/{accountId}/activity/{transactionId}")
     public ResponseEntity<Transaction> getActivityDetails(
             @PathVariable Long accountId, @PathVariable Long transactionId) {
+        accountService.getAccountById(accountId); // Validar que la cuenta exista
         Transaction transaction = transactionService.getTransactionById(transactionId);
         return ResponseEntity.ok(transaction);
     }

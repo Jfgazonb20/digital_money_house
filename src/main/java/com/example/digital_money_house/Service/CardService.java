@@ -22,12 +22,26 @@ public class CardService {
     }
 
     public List<Card> getCardsByAccountId(Long accountId) {
-        return cardRepository.findByAccountId(accountId);
+        // Verificar si la cuenta existe
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + accountId));
+        return cardRepository.findByAccountId(account.getId());
     }
 
-    public Card getCardById(Long cardId) {
-        return cardRepository.findById(cardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with ID: " + cardId));
+    public Card getCardByIdAndAccountId(Long accountId, Long cardId) {
+        // Verificar si la cuenta existe
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + accountId));
+
+        // Verificar si la tarjeta pertenece a la cuenta
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarjeta no encontrada con ID: " + cardId));
+
+        if (!card.getAccount().getId().equals(account.getId())) {
+            throw new IllegalArgumentException("La tarjeta no pertenece a la cuenta con ID: " + accountId);
+        }
+
+        return card;
     }
 
     public Card addCard(Long accountId, Card card) {
@@ -45,9 +59,17 @@ public class CardService {
         return cardRepository.save(card);
     }
 
-    public void deleteCard(Long cardId) {
+    public void deleteCard(Long accountId, Long cardId) {
+        // Verificar si la tarjeta existe
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with ID: " + cardId));
+                .orElseThrow(() -> new ResourceNotFoundException("Tarjeta no encontrada con ID: " + cardId));
+
+        // Validar que la tarjeta pertenece a la cuenta del usuario
+        if (!card.getAccount().getId().equals(accountId)) {
+            throw new IllegalArgumentException("La tarjeta no pertenece a la cuenta con ID: " + accountId);
+        }
+
+        // Si pasa la validación, se elimina
         cardRepository.delete(card);
     }
 }

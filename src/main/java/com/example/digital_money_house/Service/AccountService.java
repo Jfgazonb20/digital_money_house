@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AccountService {
@@ -24,13 +25,33 @@ public class AccountService {
     // Obtener cuenta por ID
     public Account getAccountById(Long id) {
         return accountRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + id));
+    }
+
+    // Obtener transacciones de una cuenta
+    public List<Transaction> getAccountTransactions(Long accountId) {
+        if (!accountRepository.existsById(accountId)) {
+            throw new ResourceNotFoundException("Cuenta no encontrada con ID: " + accountId);
+        }
+        return transactionRepository.findByAccountIdOrderByDateDesc(accountId);
+    }
+
+    // Obtener detalle de una transacción específica
+    public Transaction getTransactionDetails(Long accountId, Long transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada con ID: " + transactionId));
+
+        if (!transaction.getAccount().getId().equals(accountId)) {
+            throw new IllegalArgumentException("La transacción no pertenece a la cuenta con ID: " + accountId);
+        }
+
+        return transaction;
     }
 
     // Actualizar cuenta
     public Account updateAccount(Long id, Account updatedAccountData) {
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + id));
 
         if (updatedAccountData.getAccountNumber() != null) {
             account.setAccountNumber(updatedAccountData.getAccountNumber());

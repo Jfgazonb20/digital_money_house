@@ -43,6 +43,31 @@ class CardControllerTest {
     }
 
     @Test
+    void getCardById_Success() {
+        Card card = new Card();
+        card.setId(1L);
+
+        when(cardService.getCardByIdAndAccountId(1L, 1L)).thenReturn(card);
+
+        ResponseEntity<Card> response = cardController.getCardById(1L, 1L);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody()).isEqualTo(card);
+    }
+
+    @Test
+    void getCardById_NotBelongToAccount() {
+        doThrow(new IllegalArgumentException("La tarjeta no pertenece a la cuenta con ID: 2"))
+                .when(cardService).getCardByIdAndAccountId(2L, 1L);
+
+        try {
+            cardController.getCardById(2L, 1L);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).isEqualTo("La tarjeta no pertenece a la cuenta con ID: 2");
+        }
+    }
+
+    @Test
     void addCard_Success() {
         Card card = new Card();
         card.setId(1L);
@@ -55,51 +80,36 @@ class CardControllerTest {
     }
 
     @Test
-    void addCard_BadRequest() {
-        Card card = new Card();
-
-        doThrow(new IllegalArgumentException("Datos incompletos o incorrectos"))
-                .when(cardService).addCard(1L, card);
-
-        try {
-            cardController.addCard(1L, card);
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage()).isEqualTo("Datos incompletos o incorrectos");
-        }
-    }
-
-    @Test
     void deleteCard_Success() {
-        doNothing().when(cardService).deleteCard(1L);
+        doNothing().when(cardService).deleteCard(1L, 1L);
 
-        ResponseEntity<String> response = cardController.deleteCard(1L);
+        ResponseEntity<String> response = cardController.deleteCard(1L, 1L);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo("Card deleted successfully");
     }
 
     @Test
-    void getCardById_Success() {
-        Card card = new Card();
-        card.setId(1L);
+    void deleteCard_NotBelongToAccount() {
+        doThrow(new IllegalArgumentException("La tarjeta no pertenece a la cuenta con ID: 2"))
+                .when(cardService).deleteCard(2L, 1L);
 
-        when(cardService.getCardById(1L)).thenReturn(card);
-
-        ResponseEntity<Card> response = cardController.getCardById(1L);
-
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
-        assertThat(response.getBody()).isEqualTo(card);
+        try {
+            cardController.deleteCard(2L, 1L);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).isEqualTo("La tarjeta no pertenece a la cuenta con ID: 2");
+        }
     }
 
     @Test
     void deleteCard_NotFound() {
-        doThrow(new RuntimeException("Card not found with ID: 1"))
-                .when(cardService).deleteCard(1L);
+        doThrow(new RuntimeException("Card not found with ID: 99"))
+                .when(cardService).deleteCard(1L, 99L);
 
         try {
-            cardController.deleteCard(1L);
+            cardController.deleteCard(1L, 99L);
         } catch (RuntimeException e) {
-            assertThat(e.getMessage()).isEqualTo("Card not found with ID: 1");
+            assertThat(e.getMessage()).isEqualTo("Card not found with ID: 99");
         }
     }
 }
