@@ -1,236 +1,119 @@
-# 🏦 Digital Money House - Billetera Virtual
+# 🏦 **Digital Money House** - Billetera Virtual
 
-## 📚 Descripción del Proyecto  
-Digital Money House es una billetera virtual diseñada para ofrecer una experiencia ágil y segura. Este proyecto es parte del desafío profesional de backend, donde se implementa una API REST que permite la gestión de cuentas, sesiones de usuario, transacciones financieras y más.
-
----
-
-## 🚀 Funcionalidades Implementadas  
-
-## 🔒 Gestión de Usuario (Sprint 1 Completado)  
-
-- **Registro de Usuario**  
-  - Autogeneración de CVU (22 dígitos) y alias (3 palabras separadas por puntos).  
-  - Validación de datos y manejo de errores.  
-  - Respuesta JSON sin incluir contraseña.
-
-- **Inicio de Sesión**  
-  - Generación de token JWT para autenticación segura.  
-  - Manejo de errores:  
-    - Usuario inexistente (404).  
-    - Contraseña incorrecta (400).  
-
-- **Cierre de Sesión**  
-  - Invalidación del token JWT.  
+![Digital Money House](https://via.placeholder.com/800x200.png?text=Digital+Money+House)  
+*¡La solución financiera que necesitas al alcance de tu mano!*
 
 ---
 
-## 🌱 Datos User y Card (Sprint 2 Completado)  
-
-### 📊 Dashboard  
-
-- **GET /accounts/{ID}**: Obtener el balance actual.  
-- **GET /accounts/{ID}/transactions**: Listar las últimas 5 transacciones.  
-
----
-## ❌ Borrar registros y reiniciar secuencia de account y Transaction
-```sql
-TRUNCATE TABLE account RESTART IDENTITY CASCADE;
-```
-
-```sql
-TRUNCATE TABLE transaction RESTART IDENTITY CASCADE;
-
-```
----
-# 📚 Instrucciones para insertar datos en la base de datos
-
-Para poder obtener información desde **Postman**, primero necesitas insertar algunos datos de ejemplo en las tablas correspondientes.
+## 📚 **Descripción del Proyecto**
+Digital Money House es una billetera virtual diseñada para ofrecer una experiencia ágil y segura. Este proyecto es parte de un desafío profesional de backend, donde se implementa una API REST que permite la gestión de usuarios, cuentas, transacciones financieras y más.
 
 ---
 
-## 1️⃣ Insertar datos en la tabla `account`
+## 🚀 **Funcionalidades Implementadas**
 
-1. Abre **pgAdmin4** y conéctate a tu base de datos.
-2. Navega a **Query Tool**.
-3. Ejecuta el siguiente SQL para insertar datos en la tabla `account`:
+### 🔒 **Gestión de Usuario (Sprint 1)**
+- **Registro de Usuario**
+  - Generación automática de:
+    - **CVU**: 22 dígitos únicos.
+    - **Alias**: 3 palabras separadas por puntos.
+  - Validación de datos y manejo de errores.
+  - **Nota:** Respuesta JSON sin incluir la contraseña.
+  - **Manejo de errores**:
+    - **400 Bad Request**: Datos inválidos.
+    - **500 Internal Server Error**: Error en el servidor.
 
-```sql
-INSERT INTO account (account_number, balance)
-VALUES
-('123456789', 1000.00);
-```
----
-## 2️⃣ Insertar datos en la tabla transaction
-Para insertar datos en la tabla transaction, sigue estos pasos:
+- **Inicio de Sesión**
+  - Login con email y contraseña.
+  - Generación de token JWT para autenticación segura.
+  - **Manejo de errores**:
+    - **404 Not Found**: Usuario inexistente.
+    - **400 Bad Request**: Contraseña incorrecta.
+    - **500 Internal Server Error**: Error en el servidor.
 
-Abre pgAdmin4 y conéctate a tu base de datos.
-Navega a Query Tool.
-Ejecuta el siguiente SQL para insertar las transacciones correspondientes:
+- **Cierre de Sesión**
+  - API para invalidar el token JWT.
+  - **Respuesta**:
+    - **200 OK**: Token invalidado correctamente.
 
-```sql
-INSERT INTO transaction (account_id, amount, date, description)
-VALUES
-(1, -200.00, '2024-11-19', 'Compra supermercado'),
-(1, 500.00, '2024-11-18', 'Pago depósito'),
-(1, -100.00, '2024-11-17', 'Pago de servicios'),
-(1, 300.00, '2024-11-16', 'Transferencia recibida'),
-(1, -50.00, '2024-11-15', 'Compra en línea');
-```
----
-### 🔥👤 API ENDPOITS USERS (funciona insertando el bearer token)
-
-- **GET http://localhost:8080/api/users/{id}**: Obtener User por ID
-
-```🆗 Salida JSON espera 200 OK
-  "id": 1,
-  "username": "nuevoUsuario",
-  "email": "nuevoUsuario@example.com",
-  "cvu": "1234567890123456789012",
-  "alias": "alias.ejemplo"
-```
-
-
-- **PATCH http://localhost:8080/api/users/{id}**: Actualizar campos
-  
-```🆗 Entrada campos  a actualizar
-  "email": "usuarioactualizado@example.com",
-  "alias": "nuevo.alias"
-```
-
-```🆗 Salida JSON espera 200 OK
-  "id": 1,
-  "username": "nuevoUsuario",
-  "email": "usuarioactualizado@example.com",
-  "cvu": "1234567890123456789012",
-  "alias": "nuevo.alias"
-```
-
-
-### 🔥💳 API ENDPOITS CARDS (funciona insertando el bearer token)
-
-
-- **POST http://localhost:8080/accounts/{id}/cards**: Agregar Tarjeta
-
-```🆗 Datos a Ingresar Para Hacer POST
-{
-  "cardNumber": "6543210987654321",
-  "cardHolderName": "Carlos López",
-  "cardType": "Crédito"
-}
-```
-
-```🆗 Respuestsa esperada 
-{
-  "id": 3,
-  "cardNumber": "6543210987654321",
-  "cardHolderName": "Carlos López",
-  "cardType": "Crédito"
-}
-```
-
-- **GET http://localhost:8080/accounts/{id}/cards**: Obtener Tarjetas Asociadas
-
-```🆗 Salida JSON espera 200 OK
-[
-  {
-    "id": 1,
-    "cardNumber": "1234567890123456",
-    "cardHolderName": "Juan Pérez",
-    "cardType": "Crédito"
-  },
-  {
-    "id": 2,
-    "cardNumber": "9876543210987654",
-    "cardHolderName": "María García",
-    "cardType": "Débito"
-  }
-]
-```
-
-- **GET http://localhost:8080/accounts/{accountId}/cards/{cardId}**: Obtener Detalle De Tarjeta Específica
-
-```🆗 Salida JSON espera 200 OK
-{
-  "id": 1,
-  "cardNumber": "1234567890123456",
-  "cardHolderName": "Juan Pérez",
-  "cardType": "Crédito"
-}
-```
-
-- **DELETE http://localhost:8080/accounts/{accountId}/cards/{cardId}**: Eliminar Tarjeta 
-
-```🆗 Salida JSON espera 200 OK
-{
-  "message": "Card deleted successfully"
-}
-```
----
-## 🎮 Gestión de Actividad Reciente (Sprint 3 Completado)
-
-- **GET http://localhost:8080/accounts/{id}/activity**: Obtener Actividad Reciente
-
-```🆗 Salida JSON espera 200 OK
-[
-  {
-    "id": 1,
-    "amount": -200.00,
-    "date": "2024-11-19T12:00:00",
-    "description": "Compra supermercado"
-  },
-  {
-    "id": 2,
-    "amount": 500.00,
-    "date": "2024-11-18T15:00:00",
-    "description": "Pago depósito"
-  }
-]
-```
-
-- **GET http://localhost:8080/accounts/{accountId}/activity/{transactionId}**: Obtener Detalles De Una Actividad
-
-```🆗 Salida JSON espera 200 OK
-{
-  "id": 1,
-  "amount": -200.00,
-  "date": "2024-11-19T12:00:00",
-  "description": "Compra supermercado"
-}
-```
-
-- **POST http://localhost:8080/accounts/{id}/transferences**: Ingresar Dinero
-
-### Parámetros en el Body (URL encoded):
-
-amount: Monto a ingresar (ej. 1000).
-description: Descripción de la transacción (ej. "Depósito en cuenta").
-```🆗 Salida JSON espera 200 OK
-{
-  "id": 10,
-  "description": "Depósito en cuenta",
-  "amount": 1000.00,
-  "date": "2024-11-19T12:00:00",
-  "account": {
-    "id": 1,
-    "accountNumber": "123456789",
-    "balance": 2000.00
-  }
-}
-```
-
-
-
+📌 **Importante:** Todos los endpoints posteriores requieren ingresar el Bearer Token para su uso.
 
 ---
-💡 **¡Seguimos construyendo una experiencia financiera segura y eficiente!**
 
-## 🛠️ Tecnologías Utilizadas  
+### 🌱 **Dashboard y Gestión de Tarjetas (Sprint 2)**
+- **Dashboard**
+  - **GET /accounts/{ID}**: Consultar saldo disponible.
+  - **GET /accounts/{ID}/transactions**: Listar los últimos 5 movimientos de la cuenta.
 
-- **Java + Spring Boot**: Desarrollo de la API REST.  
-- **POSTGRESQL**: Gestión de la base de datos.  
-- **JWT**: Seguridad y autenticación.  
-- **Docker**: Contenerización.  
-- **Swagger**: Documentación de la API.  
-- **RestAssured**: Testing automatizado.  
+- **Gestión de Perfil**
+  - **GET /users/{ID}** y **PATCH /users/{ID}**: Consultar y editar información de usuario.
+  - **GET /accounts/{ID}** y **PATCH /accounts/{ID}**: Consultar y editar información de cuenta.
 
+- **Gestión de Tarjetas**
+  - **GET /accounts/{ID}/cards**: Consultar tarjetas asociadas.
+  - **POST /accounts/{ID}/cards**: Asociar nuevas tarjetas.
+  - **DELETE /accounts/{ID}/cards/{cardID}**: Eliminar una tarjeta existente.
+  - **Manejo de errores**:
+    - **201 Created**: Tarjeta asociada correctamente.
+    - **409 Conflict**: Tarjeta ya asociada a otra cuenta.
+    - **404 Not Found**: Tarjeta no encontrada.
+
+---
+
+### 🎮 **Gestión de Actividades y Transacciones (Sprint 3)**
+- **Gestión de Actividad**
+  - **GET /accounts/{ID}/activity**: Consultar todas las actividades recientes.
+  - **GET /accounts/{ID}/activity/{transactionID}**: Consultar detalles de una actividad específica.
+  - **Manejo de errores**:
+    - **200 OK**: Datos obtenidos exitosamente.
+    - **400 Bad Request**: Solicitud inválida.
+    - **403 Forbidden**: Sin permisos.
+    - **404 Not Found**: Transacción no encontrada.
+
+- **Ingreso de Dinero**
+  - **POST /accounts/{ID}/transferences**: Registrar ingresos desde tarjeta de débito/crédito.
+  - **Respuesta**:
+    - **201 Created**: Dinero ingresado correctamente.
+
+- **Opcionales**
+  - Filtros avanzados para actividades:
+    - Por monto (e.g., $0-$1000, $1000-$5000).
+    - Por periodo o tipo de transacción (ingreso/egreso).
+
+---
+
+### 💸 **Transferencias y Mejoras (Sprint 4)**
+- **Transferencias**
+  - **GET /accounts/{ID}/transferences**: Consultar los últimos destinatarios.
+  - **POST /accounts/{ID}/transferences**: Realizar transferencias de saldo.
+  - **Manejo de errores**:
+    - **200 OK**: Transferencia realizada con éxito.
+    - **400 Bad Request**: Cuenta inexistente.
+    - **410 Gone**: Fondos insuficientes.
+
+- **Infraestructura**
+  - Configuración de un archivo `Docker Compose`.
+  - Generación de imágenes Docker para despliegue en la nube (AWS).
+
+- **Opcionales**
+  - Generación de comprobantes de transacciones en formato PDF.
+  - Visualización de las últimas 5 cuentas destinatarias de transferencias.
+
+---
+
+## 📦 **Tecnologías Utilizadas**
+- **Java + Spring Boot**: Desarrollo de la API REST.
+- **PostgreSQL**: Base de datos relacional.
+- **JWT**: Seguridad y autenticación.
+- **Docker**: Contenerización para despliegues ágiles.
+- **Swagger**: Documentación interactiva de la API.
+- **RestAssured**: Testing automatizado de endpoints.
+
+---
+
+## 🛡️ **Seguridad**
+- **JWT** (JSON Web Token): Todos los endpoints requieren autenticación mediante Bearer Token tras iniciar sesión exitosamente.
+
+---
+
+💡 **¡Con Digital Money House, construimos una experiencia financiera segura y eficiente para todos!**
